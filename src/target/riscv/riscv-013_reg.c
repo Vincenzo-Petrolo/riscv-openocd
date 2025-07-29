@@ -137,29 +137,29 @@ static int examine_vlenb(struct target *target)
 	if (res != ERROR_OK)
 		return res;
 
-	riscv_reg_t vlenb_val;
-	if (riscv_reg_get(target, &vlenb_val, GDB_REGNO_VLENB) != ERROR_OK) {
-		if (riscv_supports_extension(target, 'V'))
-			LOG_TARGET_WARNING(target, "Couldn't read vlenb; vector register access won't work.");
-		r->vlenb = 0;
-		return riscv_reg_impl_set_exist(target, GDB_REGNO_VLENB, false);
-	}
-	/* As defined by RISC-V V extension specification:
-	 * https://github.com/riscv/riscv-v-spec/blob/2f68ef7256d6ec53e4d2bd7cb12862f406d64e34/v-spec.adoc?plain=1#L67-L72 */
-	const unsigned int vlen_max = 65536;
-	const unsigned int vlenb_max = vlen_max / 8;
-	if (vlenb_val > vlenb_max) {
-		LOG_TARGET_WARNING(target, "'vlenb == %" PRIu64
-				"' is greater than maximum allowed by specification (%u); vector register access won't work.",
-				vlenb_val, vlenb_max);
-		r->vlenb = 0;
-		return ERROR_OK;
-	}
-	assert(vlenb_max <= UINT_MAX);
-	r->vlenb = (unsigned int)vlenb_val;
+	// riscv_reg_t vlenb_val;
+	// if (riscv_reg_get(target, &vlenb_val, GDB_REGNO_VLENB) != ERROR_OK) {
+	// 	if (riscv_supports_extension(target, 'V'))
+	// 		LOG_TARGET_WARNING(target, "Couldn't read vlenb; vector register access won't work.");
+	// 	r->vlenb = 0;
+	// 	return riscv_reg_impl_set_exist(target, GDB_REGNO_VLENB, false);
+	// }
+	// /* As defined by RISC-V V extension specification:
+	//  * https://github.com/riscv/riscv-v-spec/blob/2f68ef7256d6ec53e4d2bd7cb12862f406d64e34/v-spec.adoc?plain=1#L67-L72 */
+	// const unsigned int vlen_max = 65536;
+	// const unsigned int vlenb_max = vlen_max / 8;
+	// if (vlenb_val > vlenb_max) {
+	// 	LOG_TARGET_WARNING(target, "'vlenb == %" PRIu64
+	// 			"' is greater than maximum allowed by specification (%u); vector register access won't work.",
+	// 			vlenb_val, vlenb_max);
+	// 	r->vlenb = 0;
+	// 	return ERROR_OK;
+	// }
+	// assert(vlenb_max <= UINT_MAX);
+	// r->vlenb = (unsigned int)vlenb_val;
 
-	LOG_TARGET_INFO(target, "Vector support with vlenb=%u", r->vlenb);
-	return ERROR_OK;
+	r->vlenb = 0;
+	return riscv_reg_impl_set_exist(target, GDB_REGNO_VLENB, false);
 }
 
 enum misa_mxl {
@@ -274,19 +274,18 @@ static int examine_mtopi(struct target *target)
 	if (res != ERROR_OK)
 		return res;
 
-	riscv_reg_t value;
-	if (riscv_reg_get(target, &value, GDB_REGNO_MTOPI) != ERROR_OK) {
-		res = riscv_reg_impl_set_exist(target, GDB_REGNO_MTOPI, false);
-		if (res != ERROR_OK)
-			return res;
-		return riscv_reg_impl_set_exist(target, GDB_REGNO_MTOPEI, false);
-	}
-	if (riscv_reg_get(target, &value, GDB_REGNO_MTOPEI) != ERROR_OK) {
-		LOG_TARGET_INFO(target, "S?aia detected without IMSIC");
-		return riscv_reg_impl_set_exist(target, GDB_REGNO_MTOPEI, false);
-	}
-	LOG_TARGET_INFO(target, "S?aia detected with IMSIC");
-	return ERROR_OK;
+	// riscv_reg_t value;
+	// if (riscv_reg_get(target, &value, GDB_REGNO_MTOPI) != ERROR_OK) {
+	res = riscv_reg_impl_set_exist(target, GDB_REGNO_MTOPI, false);
+	if (res != ERROR_OK)
+		return res;
+	return riscv_reg_impl_set_exist(target, GDB_REGNO_MTOPEI, false);
+	// }
+	// if (riscv_reg_get(target, &value, GDB_REGNO_MTOPEI) != ERROR_OK) {
+	// 	LOG_TARGET_INFO(target, "S?aia detected without IMSIC");
+	// 	return riscv_reg_impl_set_exist(target, GDB_REGNO_MTOPEI, false);
+	// }
+	// LOG_TARGET_INFO(target, "S?aia detected with IMSIC");
 }
 
 /**

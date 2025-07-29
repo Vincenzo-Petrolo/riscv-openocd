@@ -36,7 +36,7 @@ esac
 # bootstrap the autotools
 (
 set -x
-aclocal --warnings=all
+aclocal --warnings=all -I /usr/share/aclocal
 # Apparently, not all versions of libtoolize support option --warnings=all .
 ${libtoolize} --automake --copy
 autoconf --warnings=all
