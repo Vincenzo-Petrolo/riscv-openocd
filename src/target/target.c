@@ -683,6 +683,8 @@ int target_examine_one(struct target *target)
 {
 	LOG_TARGET_DEBUG(target, "Examination started");
 
+	printf("Examining target %s...\n", target_name(target));
+
 	target_call_event_callbacks(target, TARGET_EVENT_EXAMINE_START);
 
 	int retval = target->type->examine(target);
@@ -740,8 +742,13 @@ int target_examine(void)
 			continue;
 		}
 
-		if (target->defer_examine)
+		if (target->defer_examine) {
+			printf("Target %s examination deferred.\n", target_name(target));
+			examine_attempted = false;
 			continue;
+		} else {
+			printf("Target %s examination started.\n", target_name(target));
+		}
 
 		int retval2 = target_examine_one(target);
 		if (retval2 != ERROR_OK) {
@@ -3011,6 +3018,7 @@ static int handle_target(void *priv)
 
 		if (retval != ERROR_OK && examine_attempted) {
 			target_reset_examined(target);
+			printf("Calling target_examine_one for target %s from handle_target\n", target_name(target));
 			retval = target_examine_one(target);
 			if (retval != ERROR_OK) {
 				LOG_TARGET_DEBUG(target, "Examination failed. Polling again in %dms",
