@@ -6238,7 +6238,9 @@ int riscv_enumerate_triggers(struct target *target)
 	}
 
 	riscv_reg_t orig_tselect;
-	int result = riscv_reg_get(target, &orig_tselect, GDB_REGNO_TSELECT);
+	// Skip triggers
+	// int result = riscv_reg_get(target, &orig_tselect, GDB_REGNO_TSELECT);
+	int result = ERROR_FAIL;
 	/* If tselect is not readable, the trigger module is likely not
 	 * implemented. */
 	if (result != ERROR_OK) {
